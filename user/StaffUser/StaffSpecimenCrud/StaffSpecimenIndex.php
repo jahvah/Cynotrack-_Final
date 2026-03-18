@@ -14,17 +14,9 @@ if (!isset($_SESSION['account_id']) || $_SESSION['role'] !== 'staff') {
 $donor_query = "
     SELECT s.*, d.first_name, d.last_name
     FROM specimens s
-    JOIN donors_users d ON s.specimen_owner_type = 'donor' AND s.specimen_owner_id = d.donor_id
+    JOIN donors_users d ON s.donor_id = d.donor_id
     ORDER BY s.specimen_id DESC";
 $donor_result = mysqli_query($conn, $donor_query);
-
-// Fetch self-storage specimens
-$storage_query = "
-    SELECT s.*, su.first_name, su.last_name
-    FROM specimens s
-    JOIN self_storage_users su ON s.specimen_owner_type = 'storage' AND s.specimen_owner_id = su.storage_user_id
-    ORDER BY s.specimen_id DESC";
-$storage_result = mysqli_query($conn, $storage_query);
 ?>
 
 <div class="min-h-screen bg-green-50/30 py-10 px-4 sm:px-6 lg:px-8">
@@ -104,73 +96,6 @@ $storage_result = mysqli_query($conn, $storage_query);
                             <?php endwhile; ?>
                         <?php else: ?>
                             <tr><td colspan="6" class="px-6 py-10 text-center text-gray-400 italic">No donor specimens found.</td></tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div class="bg-white border border-green-100 rounded-2xl shadow-sm overflow-hidden">
-            <div class="p-6 border-b border-green-50 bg-green-50/20 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h2 class="text-2xl font-bold text-green-900">Self-Storage Specimens</h2>
-                    <p class="text-green-600 text-sm">Specimens stored by private users for personal use.</p>
-                </div>
-                <a href="StaffSpecimenSelfStorageCrud/StaffSpecimenSelfStorageCreate.php" class="px-4 py-2 text-sm font-semibold text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition shadow-md shadow-emerald-100">+ Add Storage Specimen</a>
-            </div>
-            
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-green-50/50 border-b border-green-100">
-                            <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-green-700">Code & ID</th>
-                            <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-green-700">User Name</th>
-                            <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-green-700 text-center">Qty</th>
-                            <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-green-700 text-center">Status</th>
-                            <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-green-700">Expiry</th>
-                            <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-green-700 text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-green-50">
-                        <?php if ($storage_result && mysqli_num_rows($storage_result) > 0): ?>
-                            <?php while ($row = mysqli_fetch_assoc($storage_result)): 
-                                $display_status = ((int)$row['quantity'] === 0) ? 'used' : $row['status'];
-                                $isLocked = ($display_status === 'used' || $display_status === 'disposed');
-                                $badgeClass = match($display_status) {
-                                    'stored', 'approved' => 'bg-emerald-100 text-emerald-800 border-emerald-200',
-                                    'used', 'expired', 'disposed' => 'bg-red-100 text-red-800 border-red-200',
-                                    default => 'bg-amber-100 text-amber-800 border-amber-200',
-                                };
-                            ?>
-                                <tr class="hover:bg-green-50/30 transition">
-                                    <td class="px-6 py-4">
-                                        <div class="text-sm font-bold text-gray-900"><?= htmlspecialchars($row['unique_code']); ?></div>
-                                        <div class="text-[10px] text-green-600 font-medium uppercase tracking-tight">ID: #<?= $row['specimen_id']; ?></div>
-                                    </td>
-                                    <td class="px-6 py-4 text-sm text-gray-700"><?= htmlspecialchars($row['first_name'] . ' ' . $row['last_name']); ?></td>
-                                    <td class="px-6 py-4 text-center font-bold text-gray-900"><?= $row['quantity']; ?></td>
-                                    <td class="px-6 py-4 text-center">
-                                        <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border <?= $badgeClass ?>">
-                                            <?= ucfirst($display_status) ?>
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 text-xs text-gray-600">
-                                        <?= $row['expiration_date'] ? date("M d, Y", strtotime($row['expiration_date'])) : 'N/A'; ?>
-                                    </td>
-                                    <td class="px-6 py-4 text-right">
-                                        <?php if (!$isLocked): ?>
-                                            <div class="flex justify-end gap-3">
-                                                <a href="StaffSpecimenSelfStorageCrud/StaffSpecimenSelfStorageUpdate.php?id=<?= $row['specimen_id']; ?>" class="text-xs font-bold text-amber-600 hover:text-amber-700 uppercase">Edit</a>
-                                                <a href="StaffSpecimenSelfStorageCrud/StaffSpecimenSelfStorageDelete.php?type=storage&id=<?= $row['specimen_id']; ?>" onclick="return confirm('Are you sure?');" class="text-xs font-bold text-red-600 hover:text-red-700 uppercase">Delete</a>
-                                            </div>
-                                        <?php else: ?>
-                                            <span class="text-[10px] font-bold text-gray-400 uppercase italic">Locked</span>
-                                        <?php endif; ?>
-                                    </td>
-                                </tr>
-                            <?php endwhile; ?>
-                        <?php else: ?>
-                            <tr><td colspan="6" class="px-6 py-10 text-center text-gray-400 italic">No storage specimens found.</td></tr>
                         <?php endif; ?>
                     </tbody>
                 </table>

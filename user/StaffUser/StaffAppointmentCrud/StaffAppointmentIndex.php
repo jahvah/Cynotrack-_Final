@@ -2,7 +2,7 @@
 session_start();
 include('../../../includes/config.php');
 include('../../../includes/head.php'); 
-include('../../../includes/admin_header.php');
+include('../../../includes/staff_header.php');
 
 // STAFF access only
 if (!isset($_SESSION['account_id']) || $_SESSION['role'] !== 'staff') {
@@ -22,12 +22,6 @@ $recipient_query = "SELECT a.appointment_id, a.appointment_date, a.type, a.statu
     FROM appointments a JOIN recipients_users u ON a.user_id = u.recipient_id
     WHERE a.user_type = 'recipient' ORDER BY a.appointment_id DESC";
 $recipient_result = mysqli_query($conn, $recipient_query);
-
-// Self Storage Appointments
-$storage_query = "SELECT a.appointment_id, a.appointment_date, a.type, a.status, u.first_name, u.last_name
-    FROM appointments a JOIN self_storage_users u ON a.user_id = u.storage_user_id
-    WHERE a.user_type = 'storage' ORDER BY a.appointment_id DESC";
-$storage_result = mysqli_query($conn, $storage_query);
 
 /**
  * Helper function to render table rows consistently
@@ -89,13 +83,14 @@ function renderAppointmentRow($row, $editPath, $deletePath) {
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
                 <h1 class="text-3xl font-black text-green-900 tracking-tight">Appointment Management</h1>
-                <p class="text-green-600 text-sm">Coordinate donor, recipient, and storage schedules.</p>
+                <p class="text-green-600 text-sm">Coordinate donor and recipient schedules.</p>
             </div>
             <a href="../StaffDashboard.php" class="px-4 py-2 text-sm font-semibold text-green-700 bg-white border border-green-200 rounded-lg hover:bg-green-50 transition w-fit">
                 ← Back to Dashboard
             </a>
         </div>
 
+        <!-- Donor Appointments Table -->
         <div class="bg-white border border-green-100 rounded-2xl shadow-sm overflow-hidden">
             <div class="p-6 border-b border-green-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <h2 class="text-xl font-bold text-green-900">Donor Appointments</h2>
@@ -124,6 +119,7 @@ function renderAppointmentRow($row, $editPath, $deletePath) {
             </div>
         </div>
 
+        <!-- Recipient Appointments Table -->
         <div class="bg-white border border-green-100 rounded-2xl shadow-sm overflow-hidden">
             <div class="p-6 border-b border-green-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <h2 class="text-xl font-bold text-green-900">Recipient Appointments</h2>
@@ -146,34 +142,6 @@ function renderAppointmentRow($row, $editPath, $deletePath) {
                             <?php while ($row = mysqli_fetch_assoc($recipient_result)) renderAppointmentRow($row, 'StaffAppointmentRecipientCrud/StaffAppointmentRecipientUpdate.php', 'StaffAppointmentRecipientCrud/StaffAppointmentRecipientDelete.php'); ?>
                         <?php else: ?>
                             <tr><td colspan="6" class="px-6 py-10 text-center text-gray-400 italic">No recipient appointments scheduled.</td></tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div class="bg-white border border-green-100 rounded-2xl shadow-sm overflow-hidden">
-            <div class="p-6 border-b border-green-50 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-green-50/20">
-                <h2 class="text-xl font-bold text-green-900">Self-Storage Appointments</h2>
-                <a href="StaffAppointmentSelfStorageCrud/StaffAppointmentSelfStorageCreate.php" class="px-4 py-2 text-sm font-semibold text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition shadow-md shadow-emerald-100">+ New Storage Appt</a>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-green-50/50 border-b border-green-100">
-                            <th class="px-6 py-4 text-xs font-bold uppercase text-green-700">ID</th>
-                            <th class="px-6 py-4 text-xs font-bold uppercase text-green-700">User Name</th>
-                            <th class="px-6 py-4 text-xs font-bold uppercase text-green-700">Date & Time</th>
-                            <th class="px-6 py-4 text-xs font-bold uppercase text-green-700 text-center">Type</th>
-                            <th class="px-6 py-4 text-xs font-bold uppercase text-green-700 text-center">Status</th>
-                            <th class="px-6 py-4 text-xs font-bold uppercase text-green-700 text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-green-50">
-                        <?php if ($storage_result && mysqli_num_rows($storage_result) > 0): ?>
-                            <?php while ($row = mysqli_fetch_assoc($storage_result)) renderAppointmentRow($row, 'StaffAppointmentSelfStorageCrud/StaffAppointmentSelfStorageUpdate.php', 'StaffAppointmentSelfStorageCrud/StaffAppointmentSelfStorageDelete.php'); ?>
-                        <?php else: ?>
-                            <tr><td colspan="6" class="px-6 py-10 text-center text-gray-400 italic">No storage appointments scheduled.</td></tr>
                         <?php endif; ?>
                     </tbody>
                 </table>
