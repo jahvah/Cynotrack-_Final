@@ -15,9 +15,9 @@ if (!isset($_GET['id'])) {
 $recipient_id = intval($_GET['id']);
 
 /* =========================
-   STEP 1: GET ACCOUNT ID + IMAGE
+   STEP 1: GET ACCOUNT ID
 ========================= */
-$stmt = $conn->prepare("SELECT account_id, profile_image FROM recipients_users WHERE recipient_id=?");
+$stmt = $conn->prepare("SELECT account_id FROM recipients_users WHERE recipient_id=?");
 $stmt->bind_param("i", $recipient_id);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -29,33 +29,16 @@ if ($result->num_rows === 0) {
 
 $data = $result->fetch_assoc();
 $account_id = $data['account_id'];
-$image = $data['profile_image'];
 
 /* =========================
-   STEP 2: DELETE RECIPIENT RECORD
+   STEP 2: MAKE ACCOUNT INACTIVE
 ========================= */
-$stmt = $conn->prepare("DELETE FROM recipients_users WHERE recipient_id=?");
-$stmt->bind_param("i", $recipient_id);
-if (!$stmt->execute()) {
-    die("Recipient delete error: " . $stmt->error);
-}
-
-/* =========================
-   STEP 3: DELETE ACCOUNT RECORD
-========================= */
-$stmt = $conn->prepare("DELETE FROM accounts WHERE account_id=?");
+$stmt = $conn->prepare("UPDATE accounts SET status='inactive' WHERE account_id=?");
 $stmt->bind_param("i", $account_id);
 if (!$stmt->execute()) {
-    die("Account delete error: " . $stmt->error);
+    die("Account update error: " . $stmt->error);
 }
 
-/* =========================
-   STEP 4: DELETE PROFILE IMAGE FILE
-========================= */
-if (!empty($image) && file_exists("../../uploads/" . $image)) {
-    unlink("../../../uploads/" . $image);
-}
-
-header("Location: AdminRecipientIndex.php?success=recipient_deleted");
+header("Location: AdminRecipientIndex.php?success=recipient_inactivated");
 exit();
 ?>

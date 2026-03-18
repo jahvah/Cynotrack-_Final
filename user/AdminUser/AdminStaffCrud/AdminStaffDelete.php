@@ -15,7 +15,7 @@ if (!isset($_GET['id'])) {
 $staff_id = intval($_GET['id']);
 
 //get account id and image
-$stmt = $conn->prepare("SELECT account_id, profile_image FROM staff WHERE staff_id=?");
+$stmt = $conn->prepare("SELECT account_id FROM staff WHERE staff_id=?");
 $stmt->bind_param("i", $staff_id);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -27,27 +27,13 @@ if ($result->num_rows === 0) {
 
 $data = $result->fetch_assoc();
 $account_id = $data['account_id'];
-$image = $data['profile_image'];
 
-//delete staff
-$stmt = $conn->prepare("DELETE FROM staff WHERE staff_id=?");
-$stmt->bind_param("i", $staff_id);
-if (!$stmt->execute()) {
-    die("Staff delete error: " . $stmt->error);
-}
-
-//delete account
-$stmt = $conn->prepare("DELETE FROM accounts WHERE account_id=?");
+// make account inactive instead of deleting
+$stmt = $conn->prepare("UPDATE accounts SET status='inactive' WHERE account_id=?");
 $stmt->bind_param("i", $account_id);
 if (!$stmt->execute()) {
-    die("Account delete error: " . $stmt->error);
+    die("Account update error: " . $stmt->error);
 }
-
-//delete image file
-if (!empty($image) && file_exists("../../uploads/" . $image)) {
-    unlink("../../../uploads/" . $image);
-}
-
-header("Location: AdminStaffIndex.php?success=staff_deleted");
+header("Location: AdminStaffIndex.php?success=staff_inactivated");
 exit();
 ?>

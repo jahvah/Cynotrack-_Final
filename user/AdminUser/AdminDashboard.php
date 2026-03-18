@@ -83,16 +83,24 @@ while($row = $statusData->fetch_assoc()) {
             <p class="text-green-600 font-medium mt-1">Real-time breakdown of user accounts.</p>
         </div>
         
-        <button onclick="toggleSidebar()" class="group flex items-center gap-3 bg-white border border-green-200 px-4 py-2 rounded-xl hover:bg-green-50 transition shadow-sm">
-            <div class="space-y-1">
-                <div class="w-5 h-0.5 bg-green-800 rounded-full"></div>
-                <div class="w-3 h-0.5 bg-green-800 rounded-full group-hover:w-5 transition-all"></div>
-                <div class="w-5 h-0.5 bg-green-800 rounded-full"></div>
-            </div>
-            <span class="text-xs font-black text-green-900 uppercase tracking-widest">Profile</span>
-        </button>
+        <div class="flex gap-3">
+            <button onclick="toggleSidebar()" class="group flex items-center gap-3 bg-white border border-green-200 px-4 py-2 rounded-xl hover:bg-green-50 transition shadow-sm">
+                <div class="space-y-1">
+                    <div class="w-5 h-0.5 bg-green-800 rounded-full"></div>
+                    <div class="w-3 h-0.5 bg-green-800 rounded-full group-hover:w-5 transition-all"></div>
+                    <div class="w-5 h-0.5 bg-green-800 rounded-full"></div>
+                </div>
+                <span class="text-xs font-black text-green-900 uppercase tracking-widest">Profile</span>
+            </button>
+
+            <!-- Print Analytics Button -->
+            <button onclick="printAnalytics()" class="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-xl hover:bg-green-700 transition shadow-sm text-sm font-bold">
+                🖨️ Print Analytics
+            </button>
+        </div>
     </div>
 
+    <!-- Account Counts -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
         <div class="bg-white p-6 rounded-xl shadow-sm border border-green-100 hover:shadow-md transition">
             <p class="text-sm font-bold text-green-700">Staff</p>
@@ -108,6 +116,7 @@ while($row = $statusData->fetch_assoc()) {
         </div>
     </div>
 
+    <!-- Charts -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div class="bg-white p-8 rounded-2xl shadow-sm border border-green-50 shadow-green-100/20 h-[400px]">
             <canvas id="userTypeChart"></canvas>
@@ -129,7 +138,17 @@ while($row = $statusData->fetch_assoc()) {
         setTimeout(() => overlay.classList.toggle('opacity-0'), 10);
     }
 
-    // CHARTS
+    // PRINT ANALYTICS FUNCTION
+    function printAnalytics() {
+        const printContents = document.querySelector('.max-w-7xl').innerHTML;
+        const originalContents = document.body.innerHTML;
+        document.body.innerHTML = printContents;
+        window.print();
+        document.body.innerHTML = originalContents;
+        location.reload();
+    }
+
+    // Charts
     new Chart(document.getElementById('userTypeChart'), {
         type: 'doughnut',
         data: {
