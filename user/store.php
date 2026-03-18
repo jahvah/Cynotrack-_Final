@@ -91,15 +91,6 @@ if ($usernameExists && $emailExists) {
             $_SESSION['role_user_id'] = $conn->insert_id;
             header("Location: RecipientUser/RecipientProfile.php");
             exit;
-
-        case 'self-storage':
-            $stmt = $conn->prepare("INSERT INTO self_storage_users (account_id, first_name, last_name) VALUES (?, ?, ?)");
-            $stmt->bind_param("iss", $account_id, $first_name, $last_name);
-            $stmt->execute();
-            $_SESSION['role_user_id'] = $conn->insert_id;
-            header("Location: SelfStorageUser/SelfStorageProfile.php");
-            exit;
-
         default:
             header("Location: register.php?error=role_error");
             exit;

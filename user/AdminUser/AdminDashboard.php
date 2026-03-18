@@ -1,7 +1,8 @@
 <?php
 session_start();
 include('../../includes/config.php');
-include('../../includes/header.php');
+include('../../includes/head.php');
+include('../../includes/admin_header.php');
 
 // Security Check
 if (!isset($_SESSION['account_id']) || $_SESSION['role'] !== 'admin') {
@@ -21,7 +22,6 @@ $admin = $adminQuery->fetch_assoc();
 $staffCount = $conn->query("SELECT COUNT(*) as total FROM staff")->fetch_assoc()['total'];
 $donorCount = $conn->query("SELECT COUNT(*) as total FROM donors_users")->fetch_assoc()['total'];
 $recipientCount = $conn->query("SELECT COUNT(*) as total FROM recipients_users")->fetch_assoc()['total'];
-$storageCount = $conn->query("SELECT COUNT(*) as total FROM self_storage_users")->fetch_assoc()['total'];
 
 // Status Data
 $statusData = $conn->query("SELECT status, COUNT(*) as count FROM accounts GROUP BY status");
@@ -93,7 +93,7 @@ while($row = $statusData->fetch_assoc()) {
         </button>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
         <div class="bg-white p-6 rounded-xl shadow-sm border border-green-100 hover:shadow-md transition">
             <p class="text-sm font-bold text-green-700">Staff</p>
             <p class="text-3xl font-black text-slate-900"><?= $staffCount ?></p>
@@ -105,10 +105,6 @@ while($row = $statusData->fetch_assoc()) {
         <div class="bg-white p-6 rounded-xl shadow-sm border border-green-100 hover:shadow-md transition">
             <p class="text-sm font-bold text-green-700">Recipients</p>
             <p class="text-3xl font-black text-slate-900"><?= $recipientCount ?></p>
-        </div>
-        <div class="bg-white p-6 rounded-xl shadow-sm border border-green-100 hover:shadow-md transition">
-            <p class="text-sm font-bold text-green-700">Storage</p>
-            <p class="text-3xl font-black text-slate-900"><?= $storageCount ?></p>
         </div>
     </div>
 
@@ -133,14 +129,14 @@ while($row = $statusData->fetch_assoc()) {
         setTimeout(() => overlay.classList.toggle('opacity-0'), 10);
     }
 
-    // CHARTS (Simplified for brevity)
+    // CHARTS
     new Chart(document.getElementById('userTypeChart'), {
         type: 'doughnut',
         data: {
-            labels: ['Staff', 'Donors', 'Recipients', 'Storage'],
+            labels: ['Staff', 'Donors', 'Recipients'],
             datasets: [{
-                data: [<?= $staffCount ?>, <?= $donorCount ?>, <?= $recipientCount ?>, <?= $storageCount ?>],
-                backgroundColor: ['#064e3b', '#10b981', '#34d399', '#6ee7b7'],
+                data: [<?= $staffCount ?>, <?= $donorCount ?>, <?= $recipientCount ?>],
+                backgroundColor: ['#064e3b', '#10b981', '#34d399'],
                 borderWidth: 0
             }]
         },

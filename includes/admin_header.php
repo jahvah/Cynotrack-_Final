@@ -26,7 +26,6 @@ $role = $_SESSION['role'] ?? 'guest';
                         <a href="<?= BASE_URL ?>AdminStaffCrud/AdminStaffIndex.php" class="hover:bg-emerald-900 px-3 py-2 rounded-lg text-sm font-bold transition text-emerald-50">Staff</a>
                         <a href="<?= BASE_URL ?>AdminDonorCrud/AdminDonorIndex.php" class="hover:bg-emerald-900 px-3 py-2 rounded-lg text-sm font-bold transition text-emerald-50">Donors</a>
                         <a href="<?= BASE_URL ?>AdminRecipientCrud/AdminRecipientIndex.php" class="hover:bg-emerald-900 px-3 py-2 rounded-lg text-sm font-bold transition text-emerald-50">Recipients</a>
-                        <a href="<?= BASE_URL ?>AdminSelfStorageCrud/AdminSelfStorageIndex.php" class="hover:bg-emerald-900 px-3 py-2 rounded-lg text-sm font-bold transition text-emerald-50">Self-Storage</a>
                     <?php endif; ?>
                 </div>
             </div>

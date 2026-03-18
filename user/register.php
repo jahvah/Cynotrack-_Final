@@ -83,7 +83,7 @@ $roles = $conn->query("SELECT role_id, role_name FROM roles");
     class="w-full px-4 py-2.5 border border-green-200 rounded-lg focus:ring-2 focus:ring-green-500 outline-none bg-white transition cursor-pointer text-gray-700">
     <option value="">-- Select Role --</option>
     <?php while($role = $roles->fetch_assoc()): ?>
-        <?php if (in_array($role['role_name'], ['donor', 'recipient', 'self-storage'])): ?>
+        <?php if (in_array($role['role_name'], ['donor', 'recipient'])): ?>
             <option value="<?= $role['role_id']; ?>">
                 <?= ucfirst($role['role_name']); ?>
             </option>
